@@ -74,9 +74,25 @@ try {
 }
 }
 
+const updateSubscriptionUser = async(req, res, next) =>{
+  try {
+    console.log(req.user);
+    const { id, email } = req.user;
+    const result = await User.findByIdAndUpdate(id, req.body, { new: true });
+   const newSubscription = req.body.subscription;
+    if (!result) {
+      throw HttpError(404, "Not found");
+    }
+    res.json({email, subscription: newSubscription});
+  } catch (error) {
+    next(error);
+  }
+}
+
 export default {
   signup,
   signin,
   getCurrent,
-  signout
+  signout,
+  updateSubscriptionUser
 };
