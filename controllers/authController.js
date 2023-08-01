@@ -14,11 +14,8 @@ const signup = async (req, res, next) => {
     if(user){
       throw HttpError(409, "Email in use")
     }
-
     const hashPassword = await bcrypt.hash(password, 10)
-
     const newUser = await User.create({...req.body, password: hashPassword});
-  
     res.status(201).json({user:{
       email: newUser.email,
       subscription: newUser.subscription,
@@ -47,18 +44,39 @@ const signin = async (req, res, next) => {
       id: user._id,
     }
 
-    const token = jwt.sign(payload, JWT_SECRET, {expiresIn: "23h"})
+    const token = jwt.sign(payload, JWT_SECRET, {expiresIn: "23h"});
+    await User.findByIdAndUpdate(user._id, {token});
 
     res.json({token, user:{
       email,
-      // subscription,   /* додай це поле в res */
+      subscription: user.subscription,
     }});
   } catch (error) {
     next(error);
   }
 };
 
+const getCurrent = (req, res) => {
+  const {email, subscription} = req.user;
+  res.json({
+    email,
+    subscription
+  });
+}
+
+const signout = async (req, res, next) => {
+try {
+  const {_id} = req.user;
+  await User.findByIdAndUpdate(_id, {token: ""});
+  res.status(204).json();
+} catch (error) {
+  next(error);
+}
+}
+
 export default {
   signup,
   signin,
+  getCurrent,
+  signout
 };
