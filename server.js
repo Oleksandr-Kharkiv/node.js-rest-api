@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
+import dotenv from "dotenv"; /* import "dotenv/config" - імпорт та виклик функції одночасно (доступ до .env буде по всьому додатку, без додаткових імпортів) */
 import app from "./app.js";
 
 dotenv.config();
