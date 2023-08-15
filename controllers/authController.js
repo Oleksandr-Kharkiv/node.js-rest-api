@@ -7,7 +7,7 @@ import gravatar from "gravatar";
 import Jimp from "jimp";
 import { nanoid } from "nanoid";
 import User from "../models/user.js";
-import {HttpError, sendEmail, createVerifyEmail} from "../helpers/index.js";
+import { HttpError, sendEmail, createVerifyEmail} from "../helpers/index.js";
 
 
 dotenv.config();
@@ -68,17 +68,19 @@ const resendVerifyEmail = async(req, res) =>{
   const {email} = req.body;
   const user = await User.findOne({email});
   if(!user){
-    throw HttpError(404, 'Email not found')
+    throw HttpError(400, 'Email not found')
   }
+  console.log(user);
+  console.log(user.verify);
   if(user.verify){
-    throw HttpError(404, 'Verification has already been passed')
+    throw HttpError(400, 'Verification has already been passed')
   }
 
   const verifyEmail = createVerifyEmail({email, verificationToken: user.verificationToken});
 
   await sendEmail(verifyEmail);
 
-  res.json({"message": "Verification email sent"})
+  res.json({message: "Verification email sent"})
 }
 
 const signin = async (req, res, next) => {
